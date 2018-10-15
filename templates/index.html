@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <style>
+
+  .thumb {
+    max-width: 70%;
+    border: 1px solid #000;
+    margin: 10px 5px 0 0;
+  }
+  .upload-btn-wrapper {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+}
+
+.btn {
+  border: 2px solid gray;
+  color: gray;
+  background-color: white;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.upload-btn-wrapper input[type=file] {
+  font-size: 100px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+}
+
+.upload-btn-wrapper video {
+  font-size: 100px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+}
+  </style>
+</head>
+<body>
+<div class="container-fluid" >
+  <div class="row">
+    <div class="col-md-12" style="text-align: -webkit-center;">
+      <div class="upload-btn-wrapper">
+        <button class="btn" id="cameraButton">Take Image</button>
+        <input type="file" id="fileInput" accept="image/*" capture="user">
+
+       <!-- <input type="file" name="file" accept="" capture="camera"> -->
+       <!-- <input type="file" id="files" name="files"  /> -->
+         <!-- <input type="file" id="fileInput" accept="image/*" capture="user"> -->
+     </div>
+
+     <div class="upload-btn-wrapper">
+       <button class="btn" id="cameraButton1">Take Video</button>
+       <video id="video" width="250" height="250" autoplay ></video>
+     </div>
+
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12" style="text-align: -webkit-center;">
+      <!-- <output id="list"></output> -->
+      <img id="fileDisplayArea"></img>
+      <canvas id="canvas" width="250" height="250" style="border:2px solid red; display:none;"></canvas>
+     </div>
+    </div>
+    <!-- <div class="row">
+      <div class="col-md-12" style="text-align: -webkit-center;">
+         <button id="snap">Snap Photo</button>
+        <canvas id="canvas" width="300" height="300"></canvas>
+       </div>
+      </div> -->
+  </div>
+</div>
+<script>
+
+if (window.File && window.FileReader && window.FileList && window.Blob) {
+  $( "#fileInput" ).click(function() {
+  $("#fileDisplayArea").show();
+  $("#canvas").hide();
+  });
+  $( "#video" ).click(function() {
+    $("#fileDisplayArea").hide();
+    $("#canvas").show();
+  });
+
+  document.getElementById('fileInput').addEventListener('change',showThumbNail, false);
+  var fileDisplayArea = document.getElementById('fileDisplayArea');
+  function showThumbNail(evt){
+  var url;
+  var file;
+  file = evt.target.files[0];
+
+  if( evt.target.files[0].size <= 0){
+      showThumbNail(evt);
+  }else if (evt.target.files[0].size > 0)  {
+    loaddata(file)
+  }
+
+
+  }
+  function loaddata(file) {
+    reader = new FileReader();
+    //we need to instantiate a new FileReader object
+    reader.addEventListener("load", readThumbNail, false);
+    //we add an event listener for when a file is loaded by the FileReader
+    //this will call our function 'readThumbNail()'
+
+    reader.readAsDataURL(file);
+    //we now read the data
+  }
+
+  function readThumbNail(event) {
+//this is our callback for when the load event is sent to the FileReader
+          // var img = new Image();
+          // Set the img src property using the data URL.
+          fileDisplayArea.src = event.target.result;
+          console.log(event.target.result);
+          fileDisplayArea.className="thumb";
+
+          // Add the image to the page.
+          // fileDisplayArea.removeChild();
+          // fileDisplayArea.appendChild(img);
+//the event has a target property, the FileReader with a property 'result',
+//which is where the value we read is located
+}
+//   const fileInput = document.getElementById('fileInput');
+//   function doSomethingWithFiles(param) {
+// debugger
+//     console.log(param.files);
+//   }
+//   fileInput.addEventListener('change', (e) => doSomethingWithFiles(e.target));
+  //All the File APIs are supported.
+
+  // window.onload = function() {
+  //     const fileInput = document.getElementById('fileInput');
+  //     var fileDisplayArea = document.getElementById('fileDisplayArea');
+  //
+  //     fileInput.addEventListener('change', function(e) {
+  //
+  //       var file  = fileInput.files[0];
+  //         // debugger
+  //       console.log(file);
+  //       var imageType = /image.*/;
+  //       if (file.type.match(imageType)) {
+  //         var reader = new FileReader();
+  //
+  //         reader.onload = function(e) {
+  //           fileDisplayArea.innerHTML = "";
+  //
+  //           // Create a new image.
+  //           var img = new Image();
+  //           // Set the img src property using the data URL.
+  //           img.src = reader.result;
+  //           console.log(reader.result);
+  //           img.className="thumb";
+  //
+  //           // Add the image to the page.
+  //           fileDisplayArea.appendChild(img);
+  //         }
+  //
+  //         reader.readAsDataURL(file);
+  //
+  //       } else {
+  //         fileDisplayArea.innerHTML = "File not supported!";
+  //       }
+  //     });
+  // }
+} else {
+  alert('The File APIs are not fully supported in this browser.');
+}
+
+
+var video = document.getElementById('video');
+
+// Get access to the camera!
+if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    // Not adding `{ audio: true }` since we only want video now
+    navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+        video.src = window.URL.createObjectURL(stream);
+        video.play();
+    });
+}
+// Elements for taking the snapshot
+var canvas = document.getElementById('canvas');
+var context = canvas.getContext('2d');
+var video = document.getElementById('video');
+
+// Trigger photo take
+document.getElementById("snap").addEventListener("click", function() {
+	context.drawImage(video, 0, 0, 640, 480);
+});
+</script>
+
+
+</body>
+</html>
